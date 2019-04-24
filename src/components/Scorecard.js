@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { stringifyDiceValues } from '../helpers/stringifyDiceValues';
@@ -35,12 +35,25 @@ const ScoreButton = styled.button`
   }
 `;
 
-export default function Scorecard({ scorecard, dice, setScore }) {
+export default function Scorecard({
+  scorecard,
+  dice,
+  setScore,
+  isYahtzee,
+  total
+}) {
+  const [bonusYahtzee, setBonusYahtzee] = useState(false);
+  useEffect(() => {
+    if (isYahtzee) {
+      if (checkScore({ id: 'Yahtzee', dice: stringifyDiceValues(dice) })) {
+        setBonusYahtzee(true);
+      }
+    }
+  }, [dice]);
   return (
     <>
       {Object.keys(scorecard).map(key => (
         <ScoreContainer key={key}>
-          {console.log(scorecard[key])}
           <Title>{key}</Title>
           {scorecard[key] !== undefined ? (
             <ScoreButton disabled>{scorecard[key]}</ScoreButton>
@@ -49,18 +62,21 @@ export default function Scorecard({ scorecard, dice, setScore }) {
               onClick={() => {
                 setScore(
                   key,
-                  checkScore({ id: key, dice: stringifyDiceValues(dice) })
+                  checkScore({ id: key, dice: stringifyDiceValues(dice) }),
+                  bonusYahtzee
                 );
               }}
             >
-              {checkScore({ id: key, dice: stringifyDiceValues(dice) })}
+              {bonusYahtzee
+                ? '100'
+                : checkScore({ id: key, dice: stringifyDiceValues(dice) })}
             </ScoreButton>
           )}
         </ScoreContainer>
       ))}
       <ScoreContainer>
         <Title>Total</Title>
-        <ScoreButton disabled>40</ScoreButton>
+        <ScoreButton disabled>{total}</ScoreButton>
       </ScoreContainer>
     </>
   );

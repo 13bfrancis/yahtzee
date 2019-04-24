@@ -28,12 +28,36 @@ const App = () => {
   const [gameTurn, setGameTurn] = useState(1);
   const [turn, setTurn] = useState(0);
   const [scorecard, setScorecard] = useState(defaultScorecard);
+  const [isYahtzee, setIsYahtzee] = useState(false);
+  const [isBonus, setIsBonus] = useState(false);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     if (checkOver()) {
       setIsOver(true);
     }
+    if (!isBonus && checkBonus()) {
+      setIsBonus(true);
+    }
+    setTotal(calculateTotal());
   }, [scorecard]);
+
+  useEffect(() => {
+    if (isBonus) {
+      setScorecard({ ...scorecard, Bonus: 35 });
+    }
+  }, [isBonus]);
+
+  const calculateTotal = () => {
+    const values = Object.values(scorecard);
+    let sum = 0;
+    values.forEach(value => {
+      if (value) {
+        sum += value;
+      }
+    });
+    return sum;
+  };
 
   const isGameHandler = (isGameVal = !isGame) => {
     setIsGame(isGameVal);
@@ -69,7 +93,6 @@ const App = () => {
         });
       }
     });
-    console.log(newDice);
     setDice(newDice);
   };
   //next turn function
@@ -89,12 +112,33 @@ const App = () => {
     return true;
   };
 
-  const setScore = (key, value) => {
+  const setScore = (key, value, bonus) => {
     if (turn === 0) return;
-    setScorecard({ ...scorecard, [key]: value });
+    if (key === 'Yahtzee' && value === 50) {
+      setIsYahtzee(true);
+    }
+    if (bonus) {
+      setScorecard({
+        ...scorecard,
+        [key]: 0,
+        'Bonus Yahtzee': scorecard['Bonus Yahtzee'] + 100
+      });
+    } else {
+      setScorecard({ ...scorecard, [key]: value });
+    }
     nextTurn();
   };
-  console.log(isOver);
+
+  const checkBonus = () => {
+    let values = Object.values(scorecard);
+    let sum = 0;
+    for (let i = 0; i < 6; i++) {
+      if (values[i]) {
+        sum += values[i];
+      }
+    }
+    return sum >= 63;
+  };
   return (
     <>
       <AppHeader>
@@ -111,9 +155,17 @@ const App = () => {
             holdDie={holdDie}
             rollDice={rollDice}
             next={nextTurn}
+            total={total}
           />
         ) : (
-          <Scorecard setScore={setScore} scorecard={scorecard} dice={dice} />
+          <Scorecard
+            setScore={setScore}
+            scorecard={scorecard}
+            dice={dice}
+            isYahtzee={isYahtzee}
+            setScorecard={setScorecard}
+            total={total}
+          />
         )}
       </Container>
     </>

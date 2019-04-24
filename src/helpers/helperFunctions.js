@@ -1,22 +1,22 @@
 export const beginDice = [
   {
-    value: 4,
+    value: 1,
     hold: false
   },
   {
-    value: 4,
+    value: 1,
     hold: false
   },
   {
-    value: 6,
+    value: 1,
     hold: false
   },
   {
-    value: 4,
+    value: 1,
     hold: false
   },
   {
-    value: 6,
+    value: 1,
     hold: false
   }
 ];

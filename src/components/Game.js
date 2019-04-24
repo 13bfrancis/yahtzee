@@ -59,8 +59,7 @@ export default function Game({ dice, holdDie, rollDice, turn, isOver }) {
   return (
     <>
       <NotificationBar>
-        <h1>Turn: {turn}</h1>
-        <h1>Roll Max Value: 50</h1>
+        <h1>{!isOver ? <>Turn: {turn}</> : 'Game Over'}</h1>
       </NotificationBar>
       <Container>
         {dice.map((die, index) => (
@@ -75,10 +74,9 @@ export default function Game({ dice, holdDie, rollDice, turn, isOver }) {
           </Die>
         ))}
       </Container>
-      <RollButton disabled={turn === 3} onClick={rollDice}>
+      <RollButton disabled={turn === 3 || isOver} onClick={rollDice}>
         Roll
       </RollButton>
-      {isOver && <p>Game Over</p>}
     </>
   );
 }
