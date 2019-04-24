@@ -52,24 +52,30 @@ export default function Scorecard({
   }, [dice]);
   return (
     <>
-      {Object.keys(scorecard).map(key => (
-        <ScoreContainer key={key}>
-          <Title>{key}</Title>
-          {scorecard[key] !== undefined ? (
-            <ScoreButton disabled>{scorecard[key]}</ScoreButton>
+      {scorecard.map((items, index) => (
+        <ScoreContainer key={items.name}>
+          <Title>{items.name}</Title>
+          {scorecard[index].value !== undefined ? (
+            <ScoreButton disabled>{scorecard[index].value}</ScoreButton>
           ) : (
             <ScoreButton
               onClick={() => {
                 setScore(
-                  key,
-                  checkScore({ id: key, dice: stringifyDiceValues(dice) }),
+                  index,
+                  checkScore({
+                    id: scorecard[index].name,
+                    dice: stringifyDiceValues(dice)
+                  }),
                   bonusYahtzee
                 );
               }}
             >
               {bonusYahtzee
                 ? '100'
-                : checkScore({ id: key, dice: stringifyDiceValues(dice) })}
+                : checkScore({
+                    id: scorecard[index].name,
+                    dice: stringifyDiceValues(dice)
+                  })}
             </ScoreButton>
           )}
         </ScoreContainer>

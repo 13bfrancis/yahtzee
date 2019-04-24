@@ -44,12 +44,14 @@ const App = () => {
 
   useEffect(() => {
     if (isBonus) {
-      setScorecard({ ...scorecard, Bonus: 35 });
+      let newScorecard = [...scorecard];
+      newScorecard[6].value = 35;
+      setScorecard(newScorecard);
     }
   }, [isBonus]);
 
   const calculateTotal = () => {
-    const values = Object.values(scorecard);
+    let values = scorecard.map(item => item.value);
     let sum = 0;
     values.forEach(value => {
       if (value) {
@@ -104,7 +106,7 @@ const App = () => {
   };
 
   const checkOver = () => {
-    let values = Object.values(scorecard);
+    let values = scorecard.map(item => item.value);
     for (let i = 0; i < values.length; i++) {
       if (values[i] === undefined) {
         return false;
@@ -113,25 +115,26 @@ const App = () => {
     return true;
   };
 
-  const setScore = (key, value, bonus) => {
+  const setScore = (index, value, bonus) => {
+    let newScorecard = [...scorecard];
     if (turn === 0) return;
-    if (key === 'Yahtzee' && value === 50) {
+    if (index === 12 && value === 50) {
       setIsYahtzee(true);
     }
     if (bonus) {
-      setScorecard({
-        ...scorecard,
-        [key]: 0,
-        'Bonus Yahtzee': scorecard['Bonus Yahtzee'] + 100
-      });
+      newScorecard[index].value = 0;
+      newScorecard[newScorecard.length - 1].value =
+        newScorecard[newScorecard.length - 1].value + 100;
+      setScorecard(newScorecard);
     } else {
-      setScorecard({ ...scorecard, [key]: value });
+      newScorecard[index].value = value;
+      setScorecard(newScorecard);
     }
     nextTurn();
   };
 
   const checkBonus = () => {
-    let values = Object.values(scorecard);
+    let values = scorecard.map(item => item.value);
     let sum = 0;
     for (let i = 0; i < 6; i++) {
       if (values[i]) {
