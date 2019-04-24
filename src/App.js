@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Game from './components/Game';
 import Scorecard from './components/Scorecard';
-import { beginDice } from './helperFunctions';
+import { beginDice } from './helpers/helperFunctions';
+import { defaultScorecard } from './helpers/scorecard';
+import TabContainer from './components/TabContainer';
 
 const AppHeader = styled.header`
   text-align: center;
@@ -15,35 +17,28 @@ const AppHeader = styled.header`
   }
 `;
 
-const TabContainer = styled.div`
-  width: 100%;
-  display: flex;
-`;
-
-const TabButton = styled.button`
-  flex-grow: 1;
-  padding: 0.5rem;
-  background: none;
-  border: 1px solid black;
-  font-size: 1.2rem;
-  cursor: pointer;
-  &.active {
-    background: #36e272;
-  }
-`;
 const Container = styled.div`
   margin: 1rem;
 `;
 
 const App = () => {
   const [isGame, setIsGame] = useState(true);
+  const [isOver, setIsOver] = useState(false);
   const [dice, setDice] = useState(beginDice);
   const [gameTurn, setGameTurn] = useState(1);
   const [turn, setTurn] = useState(0);
+  const [scorecard, setScorecard] = useState(defaultScorecard);
+
+  useEffect(() => {
+    if (checkOver()) {
+      setIsOver(true);
+    }
+  }, [scorecard]);
 
   const isGameHandler = (isGameVal = !isGame) => {
     setIsGame(isGameVal);
   };
+  //roll dice function
   const rollDice = () => {
     let newDice = [];
     dice.forEach(die => {
@@ -57,12 +52,9 @@ const App = () => {
       }
     });
     setDice(newDice);
-    if (turn === 3) {
-      setTimeout(() => {
-        setIsGame(!isGame);
-      }, 3000);
-    }
+    setTurn(turn + 1);
   };
+  //hold dice function
   const holdDie = index => {
     let newDice = [];
     dice.forEach((die, i) => {
@@ -80,34 +72,48 @@ const App = () => {
     console.log(newDice);
     setDice(newDice);
   };
+  //next turn function
+  const nextTurn = () => {
+    setGameTurn(gameTurn + 1);
+    setTurn(0);
+    setDice(beginDice);
+  };
+
+  const checkOver = () => {
+    let values = Object.values(scorecard);
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] === undefined) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const setScore = (key, value) => {
+    if (turn === 0) return;
+    setScorecard({ ...scorecard, [key]: value });
+    nextTurn();
+  };
+  console.log(isOver);
   return (
     <>
       <AppHeader>
         <h1>Yahtzee</h1>
       </AppHeader>
-      <TabContainer>
-        <TabButton
-          onClick={() => {
-            isGameHandler(true);
-          }}
-          className={isGame ? 'active' : ''}
-        >
-          Game
-        </TabButton>
-        <TabButton
-          onClick={() => {
-            isGameHandler(false);
-          }}
-          className={isGame ? '' : 'active'}
-        >
-          Scorecard
-        </TabButton>
-      </TabContainer>
+      <TabContainer isGameHandler={isGameHandler} isGame={isGame} />
       <Container>
         {isGame ? (
-          <Game dice={dice} holdDie={holdDie} rollDice={rollDice} />
+          <Game
+            isOver={isOver}
+            turn={turn}
+            setTurn={turn}
+            dice={dice}
+            holdDie={holdDie}
+            rollDice={rollDice}
+            next={nextTurn}
+          />
         ) : (
-          <Scorecard />
+          <Scorecard setScore={setScore} scorecard={scorecard} dice={dice} />
         )}
       </Container>
     </>
