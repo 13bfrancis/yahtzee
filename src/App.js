@@ -169,6 +169,7 @@ const App = () => {
             isYahtzee={isYahtzee}
             setScorecard={setScorecard}
             total={total}
+            turn={turn}
           />
         )}
       </Container>

@@ -10,19 +10,16 @@ const ScoreContainer = styled.div`
   border: 1px solid black;
 `;
 const Title = styled.div`
+  font-size: 2rem;
   width: 50%;
   border-right: 1px solid black;
   text-align: center;
   padding: 0.3rem;
   font-weight: bold;
 `;
-const Instructions = styled.div`
-  width: 25%;
-  border-right: 1px solid black;
-  text-align: center;
-  padding: 0.3rem;
-`;
 const ScoreButton = styled.button`
+  cursor: pointer;
+  font-size: 2rem;
   flex-grow: 1;
   text-align: center;
   padding: 0.3rem;
@@ -36,6 +33,7 @@ const ScoreButton = styled.button`
 `;
 
 export default function Scorecard({
+  turn,
   scorecard,
   dice,
   setScore,
@@ -70,12 +68,20 @@ export default function Scorecard({
                 );
               }}
             >
-              {bonusYahtzee
-                ? '100'
-                : checkScore({
-                    id: scorecard[index].name,
-                    dice: stringifyDiceValues(dice)
-                  })}
+              <>
+                {turn === 0 ? (
+                  '-'
+                ) : (
+                  <>
+                    {bonusYahtzee
+                      ? '100'
+                      : checkScore({
+                          id: scorecard[index].name,
+                          dice: stringifyDiceValues(dice)
+                        })}
+                  </>
+                )}
+              </>
             </ScoreButton>
           )}
         </ScoreContainer>
