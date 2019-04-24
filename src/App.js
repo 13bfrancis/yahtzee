@@ -80,6 +80,7 @@ const App = () => {
   };
   //hold dice function
   const holdDie = index => {
+    if (turn === 0) return;
     let newDice = [];
     dice.forEach((die, i) => {
       if (i === index) {
